@@ -1,1 +1,13 @@
-/build/
+# Ignore system-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore compiled files
+*.o
+*.out
+
+# Ignore local configuration files
+config.ini
+
+# Ignore build directories
+build/
