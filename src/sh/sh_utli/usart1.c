@@ -2,22 +2,28 @@
 #include <stdint.h>
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_usart.h>
+#include <sds/sds.h>
 
 #include "misc.h"
 #include "stm32f10x.h"
 #include "stm32f10x_rcc.h"
+
 #define CAP 1000
 typedef struct __usart1_cache_buf {
-    char global_sh_read_buf[CAP];
+    char buf[CAP];
     int  cap;
     int  ptr;
 } usart1_cache_buf;
-usart1_cache_buf global_usart1_buf;
+usart1_cache_buf global_usart1;
+
+static int check_usart1_cache_safe() {
+    return global_usart1.cap >= global_usart1.ptr;
+}
 
 void sh_usart_init(uint32_t baudrate)
 {
-    global_usart1_buf.cap = CAP;
-    global_usart1_buf.ptr = 0;
+    global_usart1.cap = CAP;
+    global_usart1.ptr = 0;
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 
@@ -48,7 +54,8 @@ void sh_usart_init(uint32_t baudrate)
 void USART1_IRQnHandler()
 {
     if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
-        USART_ReceiveData(USART1);
+        if(check_usart1_cache_safe())
+            global_usart1.buf[global_usart1.ptr++] = USART_ReceiveData(USART1);
         USART_ClearITPendingBit(USART1, USART_IT_RXNE);
     }
 }
