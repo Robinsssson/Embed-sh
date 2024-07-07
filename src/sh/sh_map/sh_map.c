@@ -1,5 +1,7 @@
 #include "sh/sh_map.h"
 #include "stm32f10x_conf.h"
+#include <assert.h>
+
 static sh_ret sh_map_node_create(sh_map_node **p_node_arr, int size, int cap);
 static int check_map_cap(sh_map *map);
 

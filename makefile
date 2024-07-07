@@ -1,6 +1,9 @@
 # Name for output binary files
 PROJECT ?= sh_demo
-
+CC = arm-none-eabi-gcc
+LD = arm-none-eabi-gcc
+OBJCOPY = arm-none-eabi-objcopy
+CC_PATH = /opt/gcc-arm-none-eabi/arm-none-eabi
 # Path to STM32F103 standard peripheral library
 STD_PERIPH_LIBS ?= ./STM32F10x_StdPeriph_Lib_V3.6.0/
 
@@ -21,26 +24,24 @@ SOURCES += $(STD_PERIPH_LIBS)/Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x
 SOURCES += $(STD_PERIPH_LIBS)/Libraries/STM32F10x_StdPeriph_Driver/src/*.c
 SOURCES += $(STD_PERIPH_LIBS)/Libraries/CMSIS/CM3/CoreSupport/core_cm3.c
 
-INCLUDES  = -I$(INCLUDE_DIR)
+INCLUDES  = -I$(INCLUDE_DIR)/
+INCLUDES += -I3rdparty
 INCLUDES += -I$(STD_PERIPH_LIBS)/Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x/
 INCLUDES += -I$(STD_PERIPH_LIBS)/Libraries/CMSIS/CM3/CoreSupport/
 INCLUDES += -I$(STD_PERIPH_LIBS)/Libraries/STM32F10x_StdPeriph_Driver/inc/
-INCLUDES += -I/opt/gcc-arm-none-eabi/arm-none-eabi/include
+INCLUDES += -I$(CC_PATH)/include
 
-LIBS = -l$(LIB_DIR)/sds
-
+LIBS = -L$(LIB_DIR)/sds -lsds
+# LIBS = -L$(LIB_DIR)/sds -lsds
 CFLAGS  = -g -Wall --specs=nosys.specs -march=armv7-m -O0
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m3 # -mthumb-interwork
 CFLAGS += -mfloat-abi=soft # -mfpu=fpv4-sp-d16 
 CFLAGS += -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER
-CFLAGS += -Wl,--gc-sections $(INCLUDES)
+CFLAGS += -Wl,--gc-sections $(INCLUDES) $(LIBS)
 
 LDFLAGS = -T$(STARTUP_DIR)/stm32_flash.ld
 
 # Compiler, objcopy (should be in PATH)
-CC = arm-none-eabi-gcc
-LD = arm-none-eabi-gcc
-OBJCOPY = arm-none-eabi-objcopy
 
 # Path to st-flash (or should be specified in PATH)
 ST_FLASH ?= st-flash
@@ -76,11 +77,11 @@ clean:
 
 # Flash target
 flash:
-	/opt/openocd/bin/openocd -f /opt/openocd/openocd/scripts/interface/stlink-v2.cfg \
+	/opt/openocd/bin/openocd -f /opt/openocd/openocd/scripts/interface/stlink.cfg \
 	-f /opt/openocd/openocd/scripts/target/stm32f1x.cfg \
 	-c "program $(BUILD_DIR)/$(PROJECT).bin verify reset exit 0x08000000"
 
 # Generate compile_commands.json for clangd
 compile_commands:
-	@bear -- make all
-	@mv -f compile_commands.json $(BUILD_DIR)/compile_commands.json
+	bear -- make all -j2
+	mv -f compile_commands.json $(BUILD_DIR)/compile_commands.json

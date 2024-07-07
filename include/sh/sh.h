@@ -1,6 +1,5 @@
 #ifndef __SH__H__
 #define __SH__H__
-#include <stdlib.h>
 
 #include "sh/sh_map.h"
 extern char global_sh_read_buf[];

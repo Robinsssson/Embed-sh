@@ -1,8 +1,8 @@
+#include <sds/sds.h>
 #include <sh/usart1.h>
 #include <stdint.h>
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_usart.h>
-#include <sds/sds.h>
 
 #include "misc.h"
 #include "stm32f10x.h"
@@ -16,7 +16,8 @@ typedef struct __usart1_cache_buf {
 } usart1_cache_buf;
 usart1_cache_buf global_usart1;
 
-static int check_usart1_cache_safe() {
+static int check_usart1_cache_safe()
+{
     return global_usart1.cap >= global_usart1.ptr;
 }
 
@@ -43,10 +44,9 @@ void sh_usart_init(uint32_t baudrate)
                                              USART_Parity_No,
                                              USART_Mode_Rx | USART_Mode_Tx,
                                              USART_HardwareFlowControl_None};
-    USART_Init(USART1, &USART_InitStructure);
-
-    NVIC_InitTypeDef NVIC_InitStructure = {USART1_IRQn, 7, 1, ENABLE};
+    NVIC_InitTypeDef  NVIC_InitStructure  = {USART1_IRQn, 7, 1, ENABLE};
     NVIC_Init(&NVIC_InitStructure);
+    USART_Init(USART1, &USART_InitStructure);
     USART_Cmd(USART1, ENABLE);
     USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
 }
@@ -54,7 +54,7 @@ void sh_usart_init(uint32_t baudrate)
 void USART1_IRQnHandler()
 {
     if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
-        if(check_usart1_cache_safe())
+        if (check_usart1_cache_safe())
             global_usart1.buf[global_usart1.ptr++] = USART_ReceiveData(USART1);
         USART_ClearITPendingBit(USART1, USART_IT_RXNE);
     }

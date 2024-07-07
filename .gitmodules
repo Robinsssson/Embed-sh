@@ -1,3 +1,9 @@
 [submodule "3rdparty/sds"]
 	path = 3rdparty/sds
 	url = git@github.com:antirez/sds.git
+[submodule "3rdparty/newlib"]
+	path = 3rdparty/newlib
+	url = https://sourceware.org/git/newlib-cygwin.git
+[submodule "3rdparty/picolibc"]
+	path = 3rdparty/picolibc
+	url = git@github.com:picolibc/picolibc.git

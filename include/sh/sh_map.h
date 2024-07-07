@@ -1,6 +1,5 @@
 #ifndef __SH_MAP__H__
 #define __SH_MAP__H__
-#include <assert.h>
 #include <malloc.h>
 #include <stdint.h>
 #include <stdio.h>
