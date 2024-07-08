@@ -25,73 +25,19 @@
 #include <sh/usart1.h>
 #include <stdint.h>
 
-
 #include "misc.h"
 #include "stm32f10x.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_usart.h"
 #include "system_stm32f10x.h"
-
-#ifdef USE_STM32100B_EVAL
-#    include "stm32100b_eval_lcd.h"
-#elif defined USE_STM3210B_EVAL
-#    include "stm3210b_eval_lcd.h"
-#elif defined USE_STM3210E_EVAL
-#    include "stm3210e_eval_lcd.h"
-#elif defined USE_STM3210C_EVAL
-#    include "stm3210c_eval_lcd.h"
-#elif defined USE_STM32100E_EVAL
-#    include "stm32100e_eval_lcd.h"
-#endif
-
-/** @addtogroup STM32F10x_StdPeriph_Template
- * @{
- */
-
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-#ifdef USE_STM32100B_EVAL
-#    define MESSAGE1 "STM32 MD Value Line "
-#    define MESSAGE2 " Device running on  "
-#    define MESSAGE3 "  STM32100B-EVAL    "
-#elif defined(USE_STM3210B_EVAL)
-#    define MESSAGE1 "STM32 Medium Density"
-#    define MESSAGE2 " Device running on  "
-#    define MESSAGE3 "   STM3210B-EVAL    "
-#elif defined(STM32F10X_XL) && defined(USE_STM3210E_EVAL)
-#    define MESSAGE1 "  STM32 XL Density  "
-#    define MESSAGE2 " Device running on  "
-#    define MESSAGE3 "   STM3210E-EVAL    "
-#elif defined(USE_STM3210E_EVAL)
-#    define MESSAGE1 " STM32 High Density "
-#    define MESSAGE2 " Device running on  "
-#    define MESSAGE3 "   STM3210E-EVAL    "
-#elif defined(USE_STM3210C_EVAL)
-#    define MESSAGE1 " STM32 Connectivity "
-#    define MESSAGE2 " Line Device running"
-#    define MESSAGE3 " on STM3210C-EVAL   "
-#elif defined(USE_STM32100E_EVAL)
-#    define MESSAGE1 "STM32 HD Value Line "
-#    define MESSAGE2 " Device running on  "
-#    define MESSAGE3 "  STM32100E-EVAL    "
-#endif
-
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
 /* Private function prototypes -----------------------------------------------*/
-#ifdef __GNUC__
-/* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
-   set to 'Yes') calls __io_putchar() */
-#    define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-#    define PUTCHAR_PROTOTYPE int fputc(int ch, FILE* f)
-#endif /* __GNUC__ */
 
 /* Private functions ---------------------------------------------------------*/
 static __IO uint32_t TimingDelay;
-
 /* Private function prototypes -----------------------------------------------*/
 void Delay(__IO uint32_t nTime);
 void SystemConfig(void);
@@ -156,23 +102,6 @@ void TimingDelay_Decrement(void)
     if (TimingDelay != 0x00) {
         TimingDelay--;
     }
-}
-/**
- * @brief  Retargets the C library printf function to the USART.
- * @param  None
- * @retval None
- */
-PUTCHAR_PROTOTYPE
-{
-    // /* Place your implementation of fputc here */
-    // /* e.g. write a character to the USART */
-    USART_SendData(USART1, (uint8_t) ch);
-
-    // /* Loop until the end of transmission */
-    while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET) {
-    }
-
-    return ch;
 }
 
 #ifdef USE_FULL_ASSERT

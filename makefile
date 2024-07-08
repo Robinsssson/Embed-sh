@@ -17,6 +17,7 @@ LIB_DIR = lib
 SOURCES  = $(SOURCES_DIR)/main.c
 SOURCES += $(SOURCES_DIR)/sh/sh_map/sh_map.c
 SOURCES += $(SOURCES_DIR)/sh/sh.c
+SOURCES += $(SOURCES_DIR)/string/*.c
 SOURCES += $(SOURCES_DIR)/sh/sh_utli/*.c
 SOURCES += $(SOURCES_DIR)/stm32f10x_it.c
 SOURCES += $(SOURCES_DIR)/system_stm32f10x.c
@@ -29,10 +30,10 @@ INCLUDES += -I3rdparty
 INCLUDES += -I$(STD_PERIPH_LIBS)/Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x/
 INCLUDES += -I$(STD_PERIPH_LIBS)/Libraries/CMSIS/CM3/CoreSupport/
 INCLUDES += -I$(STD_PERIPH_LIBS)/Libraries/STM32F10x_StdPeriph_Driver/inc/
-INCLUDES += -I$(CC_PATH)/include
+INCLUDES += -I/opt/local/picolibc/arm-none-eabi/include
 
-LIBS = -L$(LIB_DIR)/sds -lsds
-# LIBS = -L$(LIB_DIR)/sds -lsds
+LIBS = -Llib/sds -lsds -L/opt/local/picolibc/arm-none-eabi/lib/thumb/v7-m/nofp -lc
+
 CFLAGS  = -g -Wall --specs=nosys.specs -march=armv7-m -O0
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m3 # -mthumb-interwork
 CFLAGS += -mfloat-abi=soft # -mfpu=fpv4-sp-d16 
@@ -55,7 +56,7 @@ all: $(BUILD_DIR)/$(PROJECT).elf
 # Compile target
 $(BUILD_DIR)/$(PROJECT).elf: $(OBJECTS)
 	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $(LIBS) $^ -o $@
 	$(OBJCOPY) -O ihex $@ $(BUILD_DIR)/$(PROJECT).hex
 	$(OBJCOPY) -O binary $@ $(BUILD_DIR)/$(PROJECT).bin
 
