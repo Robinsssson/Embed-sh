@@ -14,7 +14,7 @@ sh_map* sh_map_create()
 {
     sh_map* map = malloc(sizeof(sh_map));
     assert(map != NULL);
-    map->cap  = 10;
+    map->cap  = 5;
     map->size = 0;
     if (sh_map_node_create(&map->node_arr, map->size, map->cap) != RET_OK) {
         free(map); // Add this line to prevent memory leak

@@ -36,8 +36,8 @@ ENTRY(Reset_Handler)
 _estack = 0x20010000;    /* end of 64K RAM */
 
 /* Generate a link error if heap and stack don't fit into RAM */
-_Min_Heap_Size = 0;      /* required amount of heap  */
-_Min_Stack_Size = 0x200; /* required amount of stack */
+_Min_Heap_Size = 0x1000;      /* required amount of heap  */
+_Min_Stack_Size = 0xC000; /* required amount of stack */
 
 /* Specify the memory areas */
 MEMORY
@@ -66,8 +66,9 @@ SECTIONS
     *(.text*)          /* .text* sections (code) */
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
-    *(.glue_7)         /* glue arm to thumb code */
-    *(.glue_7t)        /* glue thumb to arm code */
+
+    *(.glue_7)         
+    *(.glue_7t)       
 
     KEEP (*(.init))
     KEEP (*(.fini))

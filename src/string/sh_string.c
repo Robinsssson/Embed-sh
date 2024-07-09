@@ -1,3 +1,4 @@
+#include "stm32f10x.h"
 #include <sh/sh_string.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -15,12 +16,12 @@ int sh_strcmp(const char* s1, const char* s2)
 {
     int l1 = sh_strlen(s1), l2 = sh_strlen(s2);
     if (l1 != l2)
-        return 0;
+        return false;
     while (l1--) {
         if (s1[l1] != s2[l1])
-            return 0;
+            return false;
     }
-    return 1;
+    return true;
 }
 
 int sh_strcpy(char* dest, const char* src)
@@ -61,4 +62,32 @@ int sh_strslice(char** dest, const char* src, char slice,
         end++;
     }
     return ptr;
+}
+
+int sh_findch(const char* dest, const char ch)
+{
+    for (int i = 0; dest[i] != '\0'; i++) {
+        if (dest[i] == ch)
+            return i;
+    }
+    return EOF;
+}
+
+int sh_findstr(const char* dest, const char* str)
+{
+    int l1 = sh_strlen(dest), l2 = sh_strlen(str);
+    if (l1 < l2)
+        return EOF;
+
+    for (int i = 0; i <= l1 - l2; i++) {
+        int ptr;
+        for (ptr = 0; ptr < l2; ptr++) {
+            if (dest[i + ptr] != str[ptr])
+                break;
+        }
+        if (ptr == l2)
+            return i;
+    }
+
+    return EOF;
 }

@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#include <sh/func/echo.h>
 #include <sh/sh.h>
 #include <sh/usart1.h>
 #include <stdint.h>
@@ -56,18 +57,21 @@ int main(void)
        */
     SystemInit();
     SystemConfig();
-    sh_usart_init(9600);
-    GPIO_InitTypeDef GPIO_InitStructure;
+
+    GPIO_InitTypeDef GPIO_InitStructure = {GPIO_Pin_5, GPIO_Speed_50MHz,
+                                           GPIO_Mode_Out_PP};
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_5;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
     GPIO_Init(GPIOE, &GPIO_InitStructure);
+    sh_usart_init(9600);
+    sh_register("echo", sh_echo);
+    set_code_process_level(SH_RET_ERROR);
+
     /* Infinite loop */
     while (1) {
+        sh_ret_code_processing(sh_get_stdin(0));
         GPIO_ResetBits(GPIOE, GPIO_Pin_5);
         GPIO_SetBits(GPIOB, GPIO_Pin_5);
         Delay(500);
