@@ -22,9 +22,11 @@
 #include "main.h"
 
 #include <sh/func/echo.h>
+#include <sh/func/export.h>
 #include <sh/sh.h>
 #include <sh/usart1.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "misc.h"
 #include "stm32f10x.h"
@@ -32,11 +34,19 @@
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_usart.h"
 #include "system_stm32f10x.h"
+#include <sds/sds.h>
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
 /* Private function prototypes -----------------------------------------------*/
-
+#ifdef __GNUC__
+/* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
+   set to 'Yes') calls __io_putchar() */
+// #    define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#    define PUTCHAR_PROTOTYPE int _write(int fd, char* pBuffer, int size)
+#else
+#    define PUTCHAR_PROTOTYPE int fputc(int ch, FILE* f)
+#endif /* __GNUC__ */
 /* Private functions ---------------------------------------------------------*/
 static __IO uint32_t TimingDelay;
 /* Private function prototypes -----------------------------------------------*/
@@ -65,8 +75,9 @@ int main(void)
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
     GPIO_Init(GPIOB, &GPIO_InitStructure);
     GPIO_Init(GPIOE, &GPIO_InitStructure);
-    sh_usart_init(9600);
+    sh_usart_init(115200);
     sh_register("echo", sh_echo);
+    sh_register("export", sh_export);
     set_code_process_level(SH_RET_ERROR);
 
     /* Infinite loop */
@@ -79,6 +90,20 @@ int main(void)
         GPIO_SetBits(GPIOE, GPIO_Pin_5);
         Delay(500);
     }
+}
+/**
+ * @brief  Retargets the C library printf function to the USART.
+ * @param  None
+ * @retval None
+ */
+PUTCHAR_PROTOTYPE
+{
+    for (int i = 0; i < size; i++) {
+        while ((USART1->SR & 0X40) == 0)
+            ; //等待上一次串口数据发送完成
+        USART1->DR = (uint8_t) pBuffer[i]; //写DR,串口1将发送数据
+    }
+    return size;
 }
 
 void Delay(__IO uint32_t nTime)

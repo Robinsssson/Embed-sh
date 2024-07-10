@@ -9,7 +9,7 @@ typedef enum __RET_CODE {
     RET_OK = 0,
     RET_FAIL = 255,
 } sh_ret;
-typedef int (*sh_func)(int argc, char **argv);
+typedef int (*sh_func)(char *ansys_string);
 
 typedef char * __node_key;
 typedef sh_func __node_val;

@@ -47,7 +47,7 @@ int sh_map_insert(sh_map* map, __node_key key, __node_val sh_val)
     if (ret != RET_OK)
         return ret;
     for (int i = 0; i < map->size; i++) {
-        if (sh_key_same(map->node_arr[i].key, key)) {
+        if (!sh_key_same(map->node_arr[i].key, key)) {
             map->node_arr[i].val = sh_val;
             return RET_OK;
         }
@@ -70,7 +70,7 @@ static int check_map_cap(sh_map* map)
 __node_val sh_map_get_val(sh_map* map, __node_key key)
 {
     for (int i = 0; i < map->size; i++) {
-        if (sh_key_same(map->node_arr[i].key, key)) {
+        if (!sh_key_same(map->node_arr[i].key, key)) {
             return map->node_arr[i].val;
         }
     }
